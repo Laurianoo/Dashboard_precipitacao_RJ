@@ -27,7 +27,14 @@ for file in files:
         # Verifica se a coluna 'Data' existe
         if 'Data' not in df.columns:
             raise KeyError("Coluna 'Data' não encontrada no arquivo.")
-               
+        
+        # Verifica se a coluna 'NivelConsistencia' existe
+        if 'NivelConsistencia' not in df.columns:
+            raise KeyError("Coluna 'NivelConsistencia' não encontrada no arquivo.")
+
+        # Filtrando para manter apenas os dados com NivelConsistencia == 1
+        df = df[df['NivelConsistencia'] == 1]
+
         # Tentando pegar os dias de chuva
         diaschuva = df['NumDiasDeChuva']
         diaschuva = diaschuva[:287]
