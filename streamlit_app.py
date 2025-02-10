@@ -178,12 +178,34 @@ df_acumulados_mensais['Estacao'] = df_acumulados_mensais['Estacao'].astype(str)
 
 df_mapa_mensal = pd.merge(df_estacoes, df_acumulados_mensais, on='Estacao')
 
-# Mapa de Acumulados Médios de Chuva Mensal
-st.markdown("## Mapa de Acumulados Médios de Chuva Mensal no RJ")
-
 # Substituindo vírgulas por pontos nas coordenadas
 df_mapa_mensal['Latitude'] = df_mapa_mensal['Latitude'].astype(str).str.replace(',', '.').astype(float)
 df_mapa_mensal['Longitude'] = df_mapa_mensal['Longitude'].astype(str).str.replace(',', '.').astype(float)
+# ========================================================================== MAPAS
+
+st.markdown("## Mapas de Acumulados Médios de Chuva no RJ")
+
+custom_colors = ['#F58518', '#19D3F3', '#1616A7', '#782AB6']
+# ======================================== Mapa de Acumulados Médios de Chuva mensal no RJ
+
+if df_mapa_mensal[['Latitude', 'Longitude']].isnull().any().any():
+    st.warning("Coordenadas faltando para algumas estações.")
+else:
+    fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
+                                         hover_name='Estacao', color='AcumuladoMedioMensal',
+                                         title=f"Mapa de Acumulados Médios de Chuva Mensal no RJ - Mês {selected_month}",
+                                         color_continuous_scale=custom_colors, size_max=15, zoom=6)
+    fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
+    st.plotly_chart(fig_mapa_mensal, use_container_width=True)
+
+# ======================================== Mapa de Acumulados Médios serie completa de Chuva no RJ
+
+fig_mapa = px.scatter_mapbox(df_mapa, lat='Latitude', lon='Longitude', size='AcumuladoMedio',
+                             hover_name='Estacao', color='AcumuladoMedio',
+                             title="Mapa de Acumulados Médios de Chuva no RJ para a série de dados completa",
+                             color_continuous_scale=custom_colors, size_max=15, zoom=6)
+fig_mapa.update_layout(mapbox_style="open-street-map")
+st.plotly_chart(fig_mapa, use_container_width=True)
 
 # ================================================================= Inicio dos Gráficos:
 
@@ -240,31 +262,6 @@ fig_acumed = px.bar(df_acumed_avg, x='Mes', y=precip_columns,
 
 # Exibir o gráfico
 col2.plotly_chart(fig_acumed, use_container_width=True)
-
-# ========================================================================== MAPAS
-
-st.markdown("## Mapas de Acumulados Médios de Chuva no RJ")
-
-# ======================================== Mapa de Acumulados Médios de Chuva mensal no RJ
-
-if df_mapa_mensal[['Latitude', 'Longitude']].isnull().any().any():
-    st.warning("Coordenadas faltando para algumas estações.")
-else:
-    fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
-                                         hover_name='Estacao', color='AcumuladoMedioMensal',
-                                         title=f"Mapa de Acumulados Médios de Chuva Mensal no RJ - Mês {selected_month}",
-                                         color_continuous_scale=px.colors.cyclical.IceFire, size_max=15, zoom=6)
-    fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
-    st.plotly_chart(fig_mapa_mensal, use_container_width=True)
-
-# ======================================== Mapa de Acumulados Médios serie completa de Chuva no RJ
-
-fig_mapa = px.scatter_mapbox(df_mapa, lat='Latitude', lon='Longitude', size='AcumuladoMedio',
-                             hover_name='Estacao', color='AcumuladoMedio',
-                             title="Mapa de Acumulados Médios de Chuva no RJ para a série de dados completa",
-                             color_continuous_scale=px.colors.cyclical.IceFire, size_max=15, zoom=6)
-fig_mapa.update_layout(mapbox_style="open-street-map")
-st.plotly_chart(fig_mapa, use_container_width=True)
 
 # ======================================== Separação por estações do ano
 
