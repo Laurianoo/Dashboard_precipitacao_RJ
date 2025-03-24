@@ -130,9 +130,6 @@ selected_year = st.sidebar.selectbox("Selecione o Ano", df_selecionado['Ano'].un
 # Filtrando os dados
 df_filtrado = df_selecionado[(df_selecionado['Mes'] == selected_month) & (df_selecionado['Ano'] == selected_year)]
 
-# Layout do Dashboard
-col1, col2 = st.columns(2)
-
 # Tratamentos para os mapas:
 try:
     df_estacoes = pd.read_csv(estacoes_file, sep=';', decimal=',')
@@ -181,22 +178,19 @@ df_mapa_mensal = pd.merge(df_estacoes, df_acumulados_mensais, on='Estacao')
 # Substituindo vírgulas por pontos nas coordenadas
 df_mapa_mensal['Latitude'] = df_mapa_mensal['Latitude'].astype(str).str.replace(',', '.').astype(float)
 df_mapa_mensal['Longitude'] = df_mapa_mensal['Longitude'].astype(str).str.replace(',', '.').astype(float)
+
 # ========================================================================== MAPAS
 
 st.markdown("## Mapas de Acumulados Médios de Chuva no RJ")
-
 custom_colors = ['#F58518', '#19D3F3', '#1616A7', '#782AB6']
 # ======================================== Mapa de Acumulados Médios de Chuva mensal no RJ
 
-if df_mapa_mensal[['Latitude', 'Longitude']].isnull().any().any():
-    st.warning("Coordenadas faltando para algumas estações.")
-else:
-    fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
-                                         hover_name='Estacao', color='AcumuladoMedioMensal',
-                                         title=f"Mapa de Acumulados Médios de Chuva Mensal no RJ - Mês {selected_month}",
-                                         color_continuous_scale=custom_colors, size_max=15, zoom=6)
-    fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
-    st.plotly_chart(fig_mapa_mensal, use_container_width=True)
+fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
+                                     hover_name='Estacao', color='AcumuladoMedioMensal',
+                                     title=f"Mapa de Acumulados Médios de Chuva Mensal no RJ - Mês {selected_month}",
+                                     color_continuous_scale=custom_colors, size_max=15, zoom=6)
+fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
+st.plotly_chart(fig_mapa_mensal, use_container_width=True)
 
 # ======================================== Mapa de Acumulados Médios serie completa de Chuva no RJ
 
@@ -208,6 +202,9 @@ fig_mapa.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig_mapa, use_container_width=True)
 
 # ================================================================= Inicio dos Gráficos:
+
+# Layout do Dashboard
+col1, col2 = st.columns(2)
 
 # Gráfico de acumulado de precipitação
 fig_precip = px.bar(df_filtrado, x='Data', y=precip_columns,
