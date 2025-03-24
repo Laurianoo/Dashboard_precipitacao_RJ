@@ -54,8 +54,8 @@ for file in files:
         df = df.rename(columns=rename_dict)
         precip_columns = [col for col in df.columns if col.startswith('Dia') and not col.endswith('Status')]
         
-        # Filtrando o período de 2000 a 2024
-        df = df[(df['Data'] >= '2000-01-01') & (df['Data'] <= '2024-12-31')]
+        # Filtrando o período de 2000 a 2023
+        df = df[(df['Data'] >= '2000-01-01') & (df['Data'] <= '2023-12-31')]
 
         # Calculando o acumulado de precipitação por mês e ano
         df['MesAno'] = df['Data'].dt.to_period('M')
