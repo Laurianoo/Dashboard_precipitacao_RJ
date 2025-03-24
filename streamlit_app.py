@@ -50,6 +50,10 @@ for file in files:
         # Substituindo vírgulas por pontos e convertendo para numérico
         df[precip_columns] = df[precip_columns].replace(',', '.', regex=True).apply(pd.to_numeric, errors='coerce')
 
+        rename_dict = {col: col.replace('Chuva', 'Dia') for col in precip_columns}
+        df = df.rename(columns=rename_dict)
+        precip_columns = [col for col in df.columns if col.startswith('Dia') and not col.endswith('Status')]
+        
         # Filtrando o período de 2000 a 2024
         df = df[(df['Data'] >= '2000-01-01') & (df['Data'] <= '2024-12-31')]
 
