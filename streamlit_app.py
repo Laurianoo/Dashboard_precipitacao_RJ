@@ -134,6 +134,9 @@ selected_year = st.sidebar.selectbox("Selecione o Ano", df_selecionado['Ano'].un
 # Filtrando os dados
 df_filtrado = df_selecionado[(df_selecionado['Mes'] == selected_month) & (df_selecionado['Ano'] == selected_year)]
 
+# Converter a coluna de datas para string no formato desejado (sem horário)
+df_filtrado['Data_formatada'] = df_filtrado['Data'].dt.strftime('%b %d, %Y')
+
 # Tratamentos para os mapas:
 try:
     df_estacoes = pd.read_csv(estacoes_file, sep=';', decimal=',')
@@ -210,17 +213,30 @@ st.plotly_chart(fig_mapa, use_container_width=True)
 # Layout do Dashboard
 col1, col2 = st.columns(2)
 
-# Gráfico de acumulado de precipitação
-fig_precip = px.bar(df_filtrado, x='Data', y=precip_columns,
+# Criar o gráfico com a coluna formatada
+fig_precip = px.bar(df_filtrado, x='Data_formatada', y=precip_columns,
                     title="Acumulado Mensal de Precipitação",
-                    labels={precip_columns[0]: 'Precipitação (mm)', 'Data': 'Data'})
+                    labels={precip_columns[0]: 'Precipitação (mm)', 'Data_formatada': 'Data'},
+                    )
+fig_precip.update_xaxes(
+    type='category',
+    title_text="Data"
+)
+fig_precip.update_layout(
+    yaxis_title='Milímetros',
+    legend_title_text='Dias'
+)
 col1.plotly_chart(fig_precip, use_container_width=True)
 
 # Gráfico de comparação de acumulado por ano (série histórica)
 df_comparison = df_selecionado.groupby('Ano')[precip_columns].sum().reset_index()
 fig_comparison = px.bar(df_comparison, x='Ano', y=precip_columns,
                         title="Acumulado de Precipitação Anual - Série Histórica",
-                        labels={precip_columns[0]: 'Precipitação (mm)', 'Ano': 'Ano'})
+                        labels={precip_columns[0]: 'Precipitação (mm)', 'Ano': 'Anos'})
+fig_comparison.update_layout(
+    yaxis_title='Milímetros',  # Define o rótulo do eixo Y
+    legend_title_text='Dias'     # Altera o título da legenda
+)
 col2.plotly_chart(fig_comparison, use_container_width=True)
 
 # Gráfico de dias de chuva corrigido, com base no ano selecionado
@@ -259,8 +275,11 @@ df_acumed_avg[precip_columns] = df_acumed[precip_columns] / df_selecionado['Ano'
 # Gerar o gráfico com os acumulados médios mensais
 fig_acumed = px.bar(df_acumed_avg, x='Mes', y=precip_columns,
                     title="Acumulado médio mensal de Precipitação - Série Histórica",
-                    labels={precip_columns[0]: 'Precipitação (mm)', 'Mes': 'Mes'})
-
+                    labels={precip_columns[0]: 'Precipitação (mm)', 'Mes': 'Meses'})
+fig_acumed.update_layout(
+    yaxis_title='Milímetros',  # Define o rótulo do eixo Y
+    legend_title_text='Dias'     # Altera o título da legenda
+)
 # Exibir o gráfico
 col2.plotly_chart(fig_acumed, use_container_width=True)
 
@@ -286,8 +305,11 @@ df_station_avg = df_station.groupby('Ano')[precip_columns].mean().reset_index()
 # Plotar o gráfico de médias de precipitação para a estação escolhida
 fig_station_avg = px.bar(df_station_avg, x='Ano', y=precip_columns,
                           title=f"Médias de Precipitação na Estação {station_selected} (Agrupado por Ano)",
-                          labels={precip_columns[0]: 'Precipitação (mm)', 'Ano': 'Ano'})
-
+                          labels={precip_columns[0]: 'Precipitação (mm)', 'Ano': 'Anos'})
+fig_station_avg.update_layout(
+    yaxis_title='Milímetros',  # Define o rótulo do eixo Y
+    legend_title_text='Dias'     # Altera o título da legenda
+)
 # Exibir o gráfico de médias
 st.plotly_chart(fig_station_avg, use_container_width=True)
 
@@ -297,7 +319,10 @@ df_station_sum = df_station.groupby('Ano')[precip_columns].sum().reset_index()
 # Plotar o gráfico de acumulados de precipitação para a estação escolhida
 fig_station_sum = px.bar(df_station_sum, x='Ano', y=precip_columns,
                           title=f"Acumulados de Precipitação na Estação {station_selected} (Agrupado por Ano)",
-                          labels={precip_columns[0]: 'Precipitação (mm)', 'Ano': 'Ano'})
-
+                          labels={precip_columns[0]: 'Precipitação (mm)', 'Ano': 'Anos'})
+fig_station_sum.update_layout(
+    yaxis_title='Milímetros',  # Define o rótulo do eixo Y
+    legend_title_text='Dias'     # Altera o título da legenda
+)
 # Exibir o gráfico de acumulados
 st.plotly_chart(fig_station_sum, use_container_width=True)
