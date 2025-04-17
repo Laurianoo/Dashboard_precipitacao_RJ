@@ -1,22 +1,17 @@
 const canvas = document.createElement('canvas');
-canvas.id = 'snowfall';
-canvas.style.position = 'fixed';
-canvas.style.top = '0';
-canvas.style.left = '0';
-canvas.style.width = '100%';
-canvas.style.height = '100%';
-canvas.style.pointerEvents = 'none';
+canvas.id = 'snow-canvas';
 document.body.appendChild(canvas);
 
 const ctx = canvas.getContext('2d');
-const snowflakes = [];
+let snowflakes = [];
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-resizeCanvas();
+
 window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 function createSnowflake() {
     return {
@@ -24,20 +19,20 @@ function createSnowflake() {
         y: Math.random() * canvas.height,
         radius: Math.random() * 4 + 1,
         speed: Math.random() * 1 + 0.5,
-        opacity: Math.random() * 0.5 + 0.3,
+        opacity: Math.random() * 0.5 + 0.3
     };
 }
 
 function updateSnowflakes() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    snowflakes.forEach((flake, index) => {
+    snowflakes.forEach((flake, i) => {
         flake.y += flake.speed;
         if (flake.y > canvas.height) {
-            snowflakes[index] = createSnowflake();
-            snowflakes[index].y = 0;
+            snowflakes[i] = createSnowflake();
+            snowflakes[i].y = 0;
         }
         ctx.beginPath();
-        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+        ctx.arc(flake.x, flake.y, flake.radius, 0, 2 * Math.PI);
         ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
         ctx.fill();
     });
@@ -47,4 +42,5 @@ function updateSnowflakes() {
 for (let i = 0; i < 100; i++) {
     snowflakes.push(createSnowflake());
 }
+
 updateSnowflakes();

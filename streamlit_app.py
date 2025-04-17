@@ -301,11 +301,35 @@ stations = {
 # Selecionar a estação do ano escolhida pelo usuário
 station_selected = st.selectbox('Selecione a estação do ano', list(stations.keys()))
 
-# Adicionar o efeito de neve se "Inverno" for selecionado
 if station_selected == 'Inverno':
     with open("snowfall.js", "r") as f:
         snow_script = f.read()
-    components.html(f"<script>{snow_script}</script>", height=0, width=0)
+
+    # Injetando o script diretamente no DOM global
+    st.markdown(
+        f"""
+        <style>
+        #snow-canvas {{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }}
+        </style>
+
+        <script>
+        if (!window.snowing) {{
+            window.snowing = true;
+            {snow_script}
+        }}
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 # Filtrar os dados para a estação escolhida
 df_station = df_selecionado[df_selecionado['Mes'].isin(stations[station_selected])]
