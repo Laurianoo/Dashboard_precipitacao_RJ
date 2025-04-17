@@ -114,6 +114,13 @@ st.markdown("""
     </p>
 """, unsafe_allow_html=True)
 
+st.markdown(" ")
+st.markdown("Sobre o Projeto")
+st.markdown(
+    '''Este projeto é um Dashboard Interativo de Precipitação no Estado do Rio de Janeiro, desenvolvido com Streamlit e Plotly. Ele utiliza dados pluviométricos de estações da Agência Nacional de Águas (ANA) para apresentar análises e visualizações interativas, como gráficos de precipitação acumulada, médias mensais e anuais, além de mapas georreferenciados.
+    O objetivo principal é fornecer uma ferramenta visual para explorar os dados históricos de precipitação, permitindo que os usuários analisem padrões climáticos ao longo do tempo e em diferentes estações do ano.'''
+)
+
 # Lista de estações (extraindo do nome dos arquivos)
 station_ids = [f.replace("_Chuvas.csv", "") for f in files]
 
@@ -294,10 +301,10 @@ col2.plotly_chart(fig_acumed, use_container_width=True)
 
 # Definir as estações do ano
 stations = {
-    'Outono': [3, 4, 5],  # Março, Abril, Maio
-    'Inverno': [6, 7, 8],  # Junho, Julho, Agosto
     'Primavera': [9, 10, 11],  # Setembro, Outubro, Novembro
     'Verão': [12, 1, 2],  # Dezembro, Janeiro, Fevereiro
+    'Outono': [3, 4, 5],  # Março, Abril, Maio
+    'Inverno': [6, 7, 8],  # Junho, Julho, Agosto
 }
 
 # Selecionar a estação do ano escolhida pelo usuário
@@ -334,7 +341,19 @@ fig_station_sum.update_layout(
 # Exibir o gráfico de acumulados
 st.plotly_chart(fig_station_sum, use_container_width=True)
 
-st.sidebar.title("Sobre")
+st.sidebar.markdown('Funcionalidades')
+st.sidebar.markdown('Gráficos Interativos:')
+st.sidebar.markdown('''Acumulado mensal de precipitação.
+    Comparação de acumulados anuais (série histórica).
+    Dias de chuva mensais por estação.
+    Médias e acumulados de precipitação por estação do ano.'''
+)
+st.sidebar.markdown('Mapas Georreferenciados:')
+st.sidebar.markdown('Mapa de acumulados médios mensais por estação. Mapa de acumulados médios anuais.')
+st.sidebar.markdown('Filtros Personalizados:')
+st.sidebar.markdown('Seleção de estação pluviométrica. Filtros por mês e ano. Análise por estação do ano (Primavera, Verão, Outono, Inverno).')
+
+st.sidebar.title("Contato")
 st.sidebar.markdown(
     """
     [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Laurianoo)  
