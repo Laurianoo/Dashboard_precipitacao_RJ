@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 import matplotlib.pyplot as plt
+import streamlit.components.v1 as components
 
 # Caminho dos dados
 workspace = "dados"
@@ -192,13 +193,13 @@ df_mapa_mensal['Longitude'] = df_mapa_mensal['Longitude'].astype(str).str.replac
 
 # ========================================================================== MAPAS
 
-st.markdown("## Mapas de acumulados médios de chuva no RJ")
+#st.markdown("## Mapas de acumulados médios de chuva no RJ")
 custom_colors = ['#F58518', '#19D3F3', '#1616A7', '#782AB6']
 # ======================================== Mapa de Acumulados Médios de Chuva mensal no RJ
 
 fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
                                      hover_name='Estacao', color='AcumuladoMedioMensal',
-                                     title=f"Mapa de acumulados médios de chuva mensal - Mês {selected_month}",
+                                     title=f"Mapa de acumulados médios mensal (mm) - Mês {selected_month}",
                                      color_continuous_scale=custom_colors, size_max=15, zoom=6)
 fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig_mapa_mensal, use_container_width=True)
@@ -207,7 +208,7 @@ st.plotly_chart(fig_mapa_mensal, use_container_width=True)
 
 fig_mapa = px.scatter_mapbox(df_mapa, lat='Latitude', lon='Longitude', size='AcumuladoMedio',
                              hover_name='Estacao', color='AcumuladoMedio',
-                             title="Mapa de acumulados médios de chuva anual (mm).",
+                             title="Mapa de acumulados médios anual (mm).",
                              color_continuous_scale=custom_colors, size_max=15, zoom=6)
 fig_mapa.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig_mapa, use_container_width=True)
@@ -300,6 +301,12 @@ stations = {
 # Selecionar a estação do ano escolhida pelo usuário
 station_selected = st.selectbox('Selecione a estação do ano', list(stations.keys()))
 
+# Adicionar o efeito de neve se "Inverno" for selecionado
+if station_selected == 'Inverno':
+    with open("snowfall.js", "r") as f:
+        snow_script = f.read()
+    components.html(f"<script>{snow_script}</script>", height=0, width=0)
+
 # Filtrar os dados para a estação escolhida
 df_station = df_selecionado[df_selecionado['Mes'].isin(stations[station_selected])]
 
@@ -330,3 +337,12 @@ fig_station_sum.update_layout(
 )
 # Exibir o gráfico de acumulados
 st.plotly_chart(fig_station_sum, use_container_width=True)
+
+st.sidebar.title("Sobre")
+st.sidebar.markdown(
+    """
+    [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Laurianoo)  
+    [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/davi-lauriano-da-silva-3b740523b/)
+    """,
+    unsafe_allow_html=True
+)
