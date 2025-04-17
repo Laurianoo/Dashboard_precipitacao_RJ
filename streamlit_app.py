@@ -302,14 +302,13 @@ stations = {
 station_selected = st.selectbox('Selecione a estação do ano', list(stations.keys()))
 
 if station_selected == 'Inverno':
-    with open("snowfall.js", "r") as f:
+    with open("snowfall.js", "r", encoding="utf-8") as f:
         snow_script = f.read()
 
-    # Injetando o script diretamente no DOM global
     st.markdown(
-        f"""
+        """
         <style>
-        #snow-canvas {{
+        #snow-canvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -317,19 +316,14 @@ if station_selected == 'Inverno':
             height: 100vh;
             pointer-events: none;
             z-index: 9999;
-        }}
+        }
         </style>
-
         <script>
-        if (!window.snowing) {{
-            window.snowing = true;
-            {snow_script}
-        }}
+        %s
         </script>
-        """,
+        """ % snow_script,
         unsafe_allow_html=True
     )
-
 
 # Filtrar os dados para a estação escolhida
 df_station = df_selecionado[df_selecionado['Mes'].isin(stations[station_selected])]
