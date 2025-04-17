@@ -100,7 +100,9 @@ df_dias_chuva_anual = pd.concat(dias_chuva_anual, ignore_index=True)
 # ------------------------------------------------------ STREAMLIT DASHBOARD ----------------------------------------------------
 
 # Configurando a página
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="Precipitação RJ",
+    page_icon="☁️",
+    layout="wide")
 
 # Título
 st.markdown("""
@@ -300,30 +302,6 @@ stations = {
 
 # Selecionar a estação do ano escolhida pelo usuário
 station_selected = st.selectbox('Selecione a estação do ano', list(stations.keys()))
-
-if station_selected == 'Inverno':
-    with open("snowfall.js", "r", encoding="utf-8") as f:
-        snow_script = f.read()
-
-    st.markdown(
-        """
-        <style>
-        #snow-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 9999;
-        }
-        </style>
-        <script>
-        %s
-        </script>
-        """ % snow_script,
-        unsafe_allow_html=True
-    )
 
 # Filtrar os dados para a estação escolhida
 df_station = df_selecionado[df_selecionado['Mes'].isin(stations[station_selected])]
