@@ -102,10 +102,14 @@ df_dias_chuva_anual = pd.concat(dias_chuva_anual, ignore_index=True)
 st.set_page_config(layout="wide")
 
 # Título
-st.write("""
-         # Precipitação no estado do Rio de Janeiro
-         Dados obtidos a partir de estações da ANA
-         """)
+st.markdown("""
+    <h1 style='text-align: center;'>
+        Precipitação no Estado do Rio de Janeiro
+    </h1>
+    <p style='text-align: center;'>
+        Dados obtidos a partir de estações pluviométricas da Agência Nacional de Águas (ANA).
+    </p>
+""", unsafe_allow_html=True)
 
 # Lista de estações (extraindo do nome dos arquivos)
 station_ids = [f.replace("_Chuvas.csv", "") for f in files]
@@ -188,13 +192,13 @@ df_mapa_mensal['Longitude'] = df_mapa_mensal['Longitude'].astype(str).str.replac
 
 # ========================================================================== MAPAS
 
-st.markdown("## Mapas de Acumulados Médios de Chuva no RJ")
+st.markdown("## Mapas de acumulados médios de chuva no RJ")
 custom_colors = ['#F58518', '#19D3F3', '#1616A7', '#782AB6']
 # ======================================== Mapa de Acumulados Médios de Chuva mensal no RJ
 
 fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
                                      hover_name='Estacao', color='AcumuladoMedioMensal',
-                                     title=f"Mapa de Acumulados Médios de Chuva Mensal no RJ - Mês {selected_month}",
+                                     title=f"Mapa de acumulados médios de chuva mensal - Mês {selected_month}",
                                      color_continuous_scale=custom_colors, size_max=15, zoom=6)
 fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig_mapa_mensal, use_container_width=True)
@@ -203,7 +207,7 @@ st.plotly_chart(fig_mapa_mensal, use_container_width=True)
 
 fig_mapa = px.scatter_mapbox(df_mapa, lat='Latitude', lon='Longitude', size='AcumuladoMedio',
                              hover_name='Estacao', color='AcumuladoMedio',
-                             title="Mapa de Acumulados Médios de Chuva no RJ para a série de dados completa",
+                             title="Mapa de acumulados médios de chuva anual (mm).",
                              color_continuous_scale=custom_colors, size_max=15, zoom=6)
 fig_mapa.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig_mapa, use_container_width=True)
