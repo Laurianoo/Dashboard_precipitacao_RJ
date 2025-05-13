@@ -9,7 +9,7 @@ import streamlit.components.v1 as components
 workspace = "dados"
 
 # Carregando o arquivo de coordenadas das estações
-estacoes_file = r"dados/estacoes_rj.csv"
+estacoes_file = r"dados\estacoes_rj_corrigido_ofc.csv"
 
 # Listando os arquivos no diretório
 files = [file for file in os.listdir(workspace) if file.endswith("_Chuvas.csv")]
@@ -146,7 +146,7 @@ selected_month = st.sidebar.selectbox("Selecione o Mês", df_selecionado['Mes'].
 selected_year = st.sidebar.selectbox("Selecione o Ano", df_selecionado['Ano'].unique())
 
 # Filtrando os dados
-df_filtrado = df_selecionado[(df_selecionado['Mes'] == selected_month) & (df_selecionado['Ano'] == selected_year)]
+df_filtrado = df_selecionado[(df_selecionado['Mes'] == selected_month) & (df_selecionado['Ano'] == selected_year)].copy()
 
 # Converter a coluna de datas para string no formato desejado (sem horário)
 df_filtrado['Data_formatada'] = df_filtrado['Data'].dt.strftime('%b %d, %Y')
@@ -256,7 +256,7 @@ col2.plotly_chart(fig_comparison, use_container_width=True)
 # Gráfico de dias de chuva corrigido, com base no ano selecionado
 if not df_dias_chuva_mensal.empty:
     # Filtrando os dados para a estação selecionada
-    df_dias_chuva_filtrado = df_dias_chuva_mensal[df_dias_chuva_mensal['Estacao'] == station_id]
+    df_dias_chuva_filtrado = df_dias_chuva_mensal[df_dias_chuva_mensal['Estacao'] == station_id].copy()
 
     # Convertendo a coluna 'Data' para datetime para plotagem
     df_dias_chuva_filtrado['MesAno'] = pd.to_datetime(df_dias_chuva_filtrado['Data'].astype(str) + '-01')
