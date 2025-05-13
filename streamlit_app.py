@@ -9,7 +9,7 @@ import streamlit.components.v1 as components
 workspace = "dados"
 
 # Carregando o arquivo de coordenadas das estações
-estacoes_file = r"dados\estacoes_rj_corrigido_ofc.csv"
+estacoes_file = r"dados/estacoes_rj_corrigido_ofc.csv"
 
 # Listando os arquivos no diretório
 files = [file for file in os.listdir(workspace) if file.endswith("_Chuvas.csv")]
