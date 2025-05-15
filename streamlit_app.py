@@ -11,6 +11,8 @@ workspace = "dados"
 # Carregando o arquivo de coordenadas das estações
 estacoes_file = r"dados/estacoes_rj_corrigido_ofc.csv"
 
+anos_faltantes = pd.read_excel(r"dados/anos_faltantes.xlsx")
+
 # Listando os arquivos no diretório
 files = [file for file in os.listdir(workspace) if file.endswith("_Chuvas.csv")]
 
@@ -100,23 +102,6 @@ st.set_page_config(page_title="Precipitação RJ",
     page_icon="☁️",
     layout="wide")
 
-# Título
-st.markdown("""
-    <h1 style='text-align: center;'>
-        Precipitação no Estado do Rio de Janeiro
-    </h1>
-    <p style='text-align: center;'>
-        Dados obtidos a partir de estações pluviométricas da Agência Nacional de Águas (ANA).
-    </p>
-""", unsafe_allow_html=True)
-
-st.markdown(" ")
-st.markdown("Sobre o Projeto")
-st.markdown(
-    '''Este projeto é um Dashboard Interativo de Precipitação no Estado do Rio de Janeiro, desenvolvido com Streamlit e Plotly. Ele utiliza dados pluviométricos de estações da Agência Nacional de Águas (ANA) de 1990 à 2020, para apresentar análises e visualizações interativas, como gráficos de precipitação acumulada, médias mensais e anuais, além de mapas georreferenciados.
-    O objetivo principal é fornecer uma ferramenta visual para explorar os dados históricos de precipitação, permitindo que os usuários analisem padrões climáticos ao longo do tempo e em diferentes estações do ano.'''
-)
-
 # Lista de estações (extraindo do nome dos arquivos)
 station_ids = [f.replace("_Chuvas.csv", "") for f in files]
 
@@ -147,6 +132,30 @@ df_filtrado = df_selecionado[(df_selecionado['Mes'] == selected_month) & (df_sel
 # Converter a coluna de datas para string no formato desejado (sem horário)
 df_filtrado['Data_formatada'] = df_filtrado['Data'].dt.strftime('%b %d, %Y')
 
+# Título
+st.markdown("""
+    <h1 style='text-align: center;'>
+        Precipitação no Estado do Rio de Janeiro
+    </h1>
+    <p style='text-align: center;'>
+        Dados obtidos a partir de estações pluviométricas da Agência Nacional de Águas (ANA).
+    </p>
+""", unsafe_allow_html=True)
+
+st.markdown(" ")
+st.markdown("**Atenção:**")
+st.markdown(
+    '''Os dados foram consistidos até 2005, e os dados posteriores a essa data podem não ter sido validados.
+    Além disso, os dados podem apresentar inconsistências, como dados faltantes ou erros de medição.
+    Portanto, é importante considerar essas limitações ao interpretar os resultados.'''
+)
+
+anos_faltantes['EstacaoCodigo'] = anos_faltantes['EstacaoCodigo'].astype(str)
+ano_ausente = anos_faltantes[anos_faltantes['EstacaoCodigo'] == station_id]
+if not ano_ausente.empty:
+    primeira_linha = ano_ausente.iloc[0]
+    st.markdown(f'''Anos que apresentam dados ausentes para a estação selecionada: {primeira_linha['AnosFaltantes']}.''')
+
 # Tratamentos para os mapas:
 try:
     df_estacoes = pd.read_csv(estacoes_file, sep=';', decimal=',')
@@ -172,7 +181,6 @@ try:
 
     if df_mapa[['Latitude', 'Longitude']].isnull().any().any():
         st.warning("Coordenadas faltando para algumas estações.")
-
 except FileNotFoundError:
     st.error(f"Arquivo {estacoes_file} não encontrado.")
 
@@ -200,11 +208,17 @@ df_mapa_mensal['Longitude'] = df_mapa_mensal['Longitude'].astype(str).str.replac
 
 #st.markdown("## Mapas de acumulados médios de chuva no RJ")
 custom_colors = ['#F58518', '#19D3F3', '#1616A7', '#782AB6']
+
+meses_dict = {
+    1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 6: 'Junho',
+    7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+}
+
 # ======================================== Mapa de Acumulados Médios de Chuva mensal no RJ
 
 fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
                                      hover_name='Estacao', color='AcumuladoMedioMensal',
-                                     title=f"Mapa de acumulados médios mensal (mm) - Mês {selected_month}",
+                                     title=f"Mapa de acumulados médios mensal (mm) - Para o mês de {meses_dict.get(selected_month, selected_month)}",
                                      color_continuous_scale=custom_colors, size_max=15, zoom=6)
 fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig_mapa_mensal, use_container_width=True)
@@ -215,7 +229,7 @@ fig_mapa = px.scatter_mapbox(df_mapa, lat='Latitude', lon='Longitude', size='Acu
                              hover_name='Estacao', color='AcumuladoMedio',
                              title="Mapa de acumulados médios anual (mm).",
                              color_continuous_scale=custom_colors, size_max=15, zoom=6)
-fig_mapa.update_layout(mapbox_style="open-street-map")
+fig_mapa.update_layout(mapbox_style="open-street-map", coloraxis_colorbar=dict(nticks=6))
 st.plotly_chart(fig_mapa, use_container_width=True)
 
 # ================================================================= Inicio dos Gráficos:
@@ -348,6 +362,12 @@ st.sidebar.markdown('Mapas Georreferenciados:')
 st.sidebar.markdown('Mapa de acumulados médios mensais por estação. Mapa de acumulados médios anuais.')
 st.sidebar.markdown('Filtros Personalizados:')
 st.sidebar.markdown('Seleção de estação pluviométrica. Filtros por mês e ano. Análise por estação do ano (Primavera, Verão, Outono, Inverno).')
+
+st.markdown("**Sobre o Projeto**")
+st.markdown(
+    '''Este projeto é um Dashboard Interativo de Precipitação no Estado do Rio de Janeiro, desenvolvido com Streamlit e Plotly. Ele utiliza dados pluviométricos de estações da Agência Nacional de Águas (ANA) de 1990 à 2020, para apresentar análises e visualizações interativas, como gráficos de precipitação acumulada, médias mensais e anuais, além de mapas georreferenciados.
+    O objetivo principal é fornecer uma ferramenta visual para explorar os dados históricos de precipitação, permitindo que os usuários analisem padrões climáticos ao longo do tempo e em diferentes estações do ano.'''
+)
 
 #st.sidebar.title("Contato")
 #st.sidebar.markdown(
