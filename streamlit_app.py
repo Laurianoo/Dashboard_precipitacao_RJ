@@ -4,6 +4,7 @@ import streamlit as st
 import plotly.express as px
 import matplotlib.pyplot as plt
 import streamlit.components.v1 as components
+import openpyxl
 
 # Caminho dos dados
 workspace = "dados"
