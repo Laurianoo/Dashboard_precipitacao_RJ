@@ -25,28 +25,27 @@ for file in files:
         # Lendo o arquivo ignorando as 14 primeiras linhas
         df = pd.read_csv(caminho_csv, encoding='iso-8859-1', sep=';', skiprows=14, on_bad_lines='skip')
 
-        # Verifica se a coluna 'Data' existe
-        if 'Data' not in df.columns:
-            raise KeyError("Coluna 'Data' não encontrada no arquivo.")
+        # Convertendo a coluna 'Data' para datetime
+        df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y', errors='coerce')
+        df['Ano'] = df['Data'].dt.year
         
-        # Verifica se a coluna 'NivelConsistencia' existe
-        if 'NivelConsistencia' not in df.columns:
-            raise KeyError("Coluna 'NivelConsistencia' não encontrada no arquivo.")
+        # Filtrando o período de 1990 a 2020
+        df = df[(df['Data'] >= '1990-01-01') & (df['Data'] <= '2020-12-31')]
 
-        # Filtrando para manter apenas os dados com NivelConsistencia == 1
-        df = df[df['NivelConsistencia'] == 1]
+        # Filtrando dados com NivelConsistencia
+        df = df[
+            ((df['Ano'] <= 2005) & (df['NivelConsistencia'] == 2)) |
+            ((df['Ano'] > 2005) & (df['NivelConsistencia'] == 1))
+        ]
 
         # Tentando pegar os dias de chuva
-        diaschuva = df['NumDiasDeChuva']
-        diaschuva = diaschuva[:287]
+        diaschuva = df['NumDiasDeChuva'].fillna(0).astype(int)
+        #diaschuva = diaschuva[:287]
 
         # Mantendo somente as colunas de interesse (sem status)
         precip_columns = [col for col in df.columns if col.startswith('Chuva') and not col.endswith('Status')]
         cols_to_keep = ['Data'] + precip_columns
         df = df[cols_to_keep]
-
-        # Convertendo a coluna 'Data' para datetime
-        df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y', errors='coerce')
 
         # Substituindo vírgulas por pontos e convertendo para numérico
         df[precip_columns] = df[precip_columns].replace(',', '.', regex=True).apply(pd.to_numeric, errors='coerce')
@@ -54,9 +53,6 @@ for file in files:
         rename_dict = {col: col.replace('Chuva', 'Dia') for col in precip_columns}
         df = df.rename(columns=rename_dict)
         precip_columns = [col for col in df.columns if col.startswith('Dia') and not col.endswith('Status')]
-        
-        # Filtrando o período de 1980 a 2023
-        df = df[(df['Data'] >= '1980-01-01') & (df['Data'] <= '2023-12-31')]
 
         # Calculando o acumulado de precipitação por mês e ano
         df['MesAno'] = df['Data'].dt.to_period('M')
@@ -117,7 +113,7 @@ st.markdown("""
 st.markdown(" ")
 st.markdown("Sobre o Projeto")
 st.markdown(
-    '''Este projeto é um Dashboard Interativo de Precipitação no Estado do Rio de Janeiro, desenvolvido com Streamlit e Plotly. Ele utiliza dados pluviométricos de estações da Agência Nacional de Águas (ANA) para apresentar análises e visualizações interativas, como gráficos de precipitação acumulada, médias mensais e anuais, além de mapas georreferenciados.
+    '''Este projeto é um Dashboard Interativo de Precipitação no Estado do Rio de Janeiro, desenvolvido com Streamlit e Plotly. Ele utiliza dados pluviométricos de estações da Agência Nacional de Águas (ANA) de 1990 à 2020, para apresentar análises e visualizações interativas, como gráficos de precipitação acumulada, médias mensais e anuais, além de mapas georreferenciados.
     O objetivo principal é fornecer uma ferramenta visual para explorar os dados históricos de precipitação, permitindo que os usuários analisem padrões climáticos ao longo do tempo e em diferentes estações do ano.'''
 )
 
@@ -353,11 +349,11 @@ st.sidebar.markdown('Mapa de acumulados médios mensais por estação. Mapa de a
 st.sidebar.markdown('Filtros Personalizados:')
 st.sidebar.markdown('Seleção de estação pluviométrica. Filtros por mês e ano. Análise por estação do ano (Primavera, Verão, Outono, Inverno).')
 
-st.sidebar.title("Contato")
-st.sidebar.markdown(
-    """
-    [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Laurianoo)  
-    [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/davi-lauriano-da-silva-3b740523b/)
-    """,
-    unsafe_allow_html=True
-)
+#st.sidebar.title("Contato")
+#st.sidebar.markdown(
+#    """
+#    [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Laurianoo)  
+#    [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/davi-lauriano-da-silva)
+#    """,
+#    unsafe_allow_html=True
+#)
