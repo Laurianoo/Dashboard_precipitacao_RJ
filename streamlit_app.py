@@ -207,7 +207,6 @@ df_mapa_mensal['Longitude'] = df_mapa_mensal['Longitude'].astype(str).str.replac
 
 # ========================================================================== MAPAS
 
-#st.markdown("## Mapas de acumulados médios de chuva no RJ")
 custom_colors = ['#F58518', '#19D3F3', '#1616A7', '#782AB6']
 
 meses_dict = {
@@ -215,16 +214,12 @@ meses_dict = {
     7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
 }
 
-# ======================================== Mapa de Acumulados Médios de Chuva mensal no RJ
-
 fig_mapa_mensal = px.scatter_mapbox(df_mapa_mensal, lat='Latitude', lon='Longitude', size='AcumuladoMedioMensal',
                                      hover_name='Estacao', color='AcumuladoMedioMensal',
                                      title=f"Mapa de acumulados médios mensal (mm) - Para o mês de {meses_dict.get(selected_month, selected_month)}",
                                      color_continuous_scale=custom_colors, size_max=15, zoom=6)
 fig_mapa_mensal.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig_mapa_mensal, use_container_width=True)
-
-# ======================================== Mapa de Acumulados Médios serie completa de Chuva no RJ
 
 fig_mapa = px.scatter_mapbox(df_mapa, lat='Latitude', lon='Longitude', size='AcumuladoMedio',
                              hover_name='Estacao', color='AcumuladoMedio',
